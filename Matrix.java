@@ -73,7 +73,14 @@ public class Matrix {
                     C[i][j] += (A[i][k] * B[k][j]);
         return C;
     }
-
+    
+    // scalar-matrix multiplicatoin (B = k * A)
+    public static double[][] multiply(double k. double[][] A) {
+        for (int r = 0 ; r < A.length ; r++) {
+            for (int c = 0 ; c < A[r].length ; c++)
+        }
+    }   
+    
     // matrix-vector multiplication (y = A * x)
     public static double[] multiply(double[][] A, double[] x) {
         int m = A.length;
@@ -98,3 +105,5 @@ public class Matrix {
                 y[j] += (A[i][j] * x[i]);
         return y;
     }
+    
+    // 
