@@ -53,11 +53,11 @@ public class MatrixMath {
     }
 
     /**
-     * Returns the dot product of two arrays as defined in vectors. In vectors, 
-     * the dot product is the scalar sum of the products of each of the 
-     * corresponding entries in two arrays.
-     * @param x
-     * @return 
+     * Returns the dot product of multiple arrays as defined by vectors.
+     * In vectors, the dot product is the scalar sum of the products of 
+     * each of the corresponding entries in multiple arrays.
+     * @param x the vectors to calculate the dot product of
+     * @return the dot product of the arrays (denoted xA · xB)
      */
     public static double dot(double[]... x) {
         int m = x.length;
@@ -82,8 +82,8 @@ public class MatrixMath {
      * Returns an array representing the transposition of the specified
      * array. The transposition of of a matrix is defined to be the matrix
      * whose rows represent the columns of the original matrix.
-     * @param A
-     * @return 
+     * @param A the array to be transposed
+     * @return the transposition of an array ( denoted A^T)
      */
     public static double[][] transpose(double[][] A) {
         int m = A.length;
@@ -100,8 +100,8 @@ public class MatrixMath {
      * addition, the corresponding entries of multiple matrices are summed to 
      * form the resultant entry. As a direct consequence, the arrays must be of
      * the same dimensions.
-     * @param A the arrays to be summed
-     * @return an array representing the sum of the arrays by matrix addition
+     * @param A the addend arrays
+     * @return the sum of the arrays (denoted A + B)
      */
     public static double[][] add(double[][]... A) {
         int m = A[0].length;
@@ -118,12 +118,13 @@ public class MatrixMath {
     }
 
     /**
-     * Returns the sum of arrays as defined by matrix addition. In matrix
-     * addition, the corresponding entries of multiple matrices are summed to 
+     * Returns the difference of two arrays as defined by matrix addition. In matrix
+     * subtraction, the corresponding entries of multiple matrices are subtracted to 
      * form the resultant entry. As a direct consequence, the arrays must be of
      * the same dimensions.
-     * @param A the arrays to be summed
-     * @return an array representing the sum of the arrays by matrix addition
+     * @param A the minuend array
+     * @param B the subtrahend array
+     * @return the difference of the two arrays (denoted A - B)
      */
     public static double[][] subtract(double[][] A, double[][] B) {
         int m = A.length;
@@ -135,7 +136,11 @@ public class MatrixMath {
         return C;
     }
 
-    // matrix-matrix multiplication (C = A * b)
+    /**
+     * Returns the product of two arrays as defined by matrix multiplication.
+     * In matrix multiplication, 
+     * 
+     */
     public static double[][] multiply(double[][] A, double[][] B) {
         int mA = A.length;
         int nA = A[0].length;
