@@ -80,7 +80,7 @@ public class MatrixMath {
 
     /**
      * Returns an array representing the transposition of the specified
-     * array. The transposition of of a matrix is defined to be the matrix
+     * matrix. The transposition of of a matrix is defined to be the matrix
      * whose rows represent the columns of the original matrix.
      * @param A the array to be transposed
      * @return the transposition of an array ( denoted A^T)
@@ -96,12 +96,12 @@ public class MatrixMath {
     }
 
     /**
-     * Returns the difference of arrays as defined by matrix subtraction. In matrix
+     * Returns an array representing the sum of multiple matrices. In matrix
      * addition, the corresponding entries of multiple matrices are summed to 
      * form the resultant entry. As a direct consequence, the arrays must be of
-     * the same dimensions.
-     * @param A the addend arrays
-     * @return the sum of the arrays (denoted A + B)
+     * the same order.
+     * @param A the addend arrays representing matrices
+     * @return the sum of the matrices (denoted A + B)
      */
     public static double[][] add(double[][]... A) {
         int m = A[0].length;
@@ -118,13 +118,13 @@ public class MatrixMath {
     }
 
     /**
-     * Returns the difference of two arrays as defined by matrix addition. In matrix
+     * Returns an array representing the difference of multiple matrices. In matrix
      * subtraction, the corresponding entries of multiple matrices are subtracted to 
      * form the resultant entry. As a direct consequence, the arrays must be of
-     * the same dimensions.
-     * @param A the minuend array
-     * @param B the subtrahend array
-     * @return the difference of the two arrays (denoted A - B)
+     * the same order.
+     * @param A the minuend array representing a matrix
+     * @param B the subtrahend array representing a matrix
+     * @return the difference of the two matrices (denoted A - B)
      */
     public static double[][] subtract(double[][] A, double[][] B) {
         int m = A.length;
@@ -137,9 +137,14 @@ public class MatrixMath {
     }
 
     /**
-     * Returns the product of two arrays as defined by matrix multiplication.
-     * In matrix multiplication, 
-     * 
+     * Returns an array representing the product of two matrices.  In matrix 
+     * multiplication, the resultant entry sub ij is equal to the scalar 
+     * (dot) product of the ith row of the initial matrix and jth column of
+     * the terminal. As a direct consequence, the column order of the intial
+     * array must be equal to equal to the row order of the terminal.
+     * @param A the initial array representing a matrix
+     * @param B the terminal array representing a matrix
+     * @return the product of the two matrices (denoted AB)
      */
     public static double[][] multiply(double[][] A, double[][] B) {
         int mA = A.length;
@@ -155,7 +160,13 @@ public class MatrixMath {
         return C;
     }
     
-    // scalar-matrix multiplicatoin (B = k * A)
+    /**
+     * Returns an array representing the product of a scalar and a matrix.
+     * Each entry of the matrix is multiplied by the scalar.
+     * @param k a scalar
+     * @param A an array representing a matrix
+     * @return the product of the scalar and the array (denoted kA)
+     */
     public static double[][] multiply(double k, double[][] A) {
         double[][] B = new double[A.length][A[0].length];
         for (int r = 0 ; r < A.length ; r++) {
