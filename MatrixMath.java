@@ -1,7 +1,13 @@
 package matrix.matrix;
 
 /**
- * @author Thurman
+ * Provides a collection of methods to manipulate arrays as matrices. A 
+ * <i>matrix</i> is defined to be a rectangular array of numbers (which can be
+ * represented as Number[][]). The size of the array is known as the
+ * <i>order</i> of the matrix, denoted m x n, where m is the amount of rows and
+ * n the columns. Each element of a matrix is known as an <i>entry</i>,
+ * accessible by its unique row and column, also known as the entry's order.
+ * @author Robert Sedgewick and Kevin Wayne
  */
 public class MatrixMath {
 
@@ -23,10 +29,10 @@ public class MatrixMath {
     /**
      * Returns an array representing an identity matrix of specified size. The 
      * identity matrix is defined to be a square matrix with ones as all entries
-     * with the same row and column. The rest of the entries have the value of 
-     * zero.
+     * with the same delineating row and column. The rest of the entries have 
+     * the value of zero.
      * @param n the number of rows and columns of the array
-     * @return an n x n array representing an identity matrix
+     * @return an n x n array representing an identity matrix (I sub n)
      */
     public static double[][] identity(int n) {
         double[][] I = new double[n][n];
@@ -46,16 +52,39 @@ public class MatrixMath {
         return new double[m][n];
     }
 
-    // return x^T y
-    public static double dot(double[] x, double[] y) {
-        if (x.length != y.length) throw new RuntimeException("Illegal vector dimensions.");
+    /**
+     * Returns the dot product of two arrays as defined in vectors. In vectors, 
+     * the dot product is the scalar sum of the products of each of the 
+     * corresponding entries in two arrays.
+     * @param x
+     * @return 
+     */
+    public static double dot(double[]... x) {
+        int m = x.length;
+        for (double[] arr : x) {
+            if (arr.length != m) {
+                throw new RuntimeException();
+            }
+        }
         double sum = 0.0;
-        for (int i = 0; i < x.length; i++)
-            sum += x[i] * y[i];
+        double product;
+        for (int i = 0; i < x[0].length; i++) {
+            product = 1;
+            for (int j = 0 ; j < x.length ; j++) {
+               product *= x[i][j];
+            }
+            sum += product;
+        }
         return sum;
     }
 
-    // return C = A^T
+    /**
+     * Returns an array representing the transposition of the specified
+     * array. The transposition of of a matrix is defined to be the matrix
+     * whose rows represent the columns of the original matrix.
+     * @param A
+     * @return 
+     */
     public static double[][] transpose(double[][] A) {
         int m = A.length;
         int n = A[0].length;
@@ -67,16 +96,16 @@ public class MatrixMath {
     }
 
     /**
-     * Returns the sum of arrays as established by matrix addition. In matrix
+     * Returns the difference of arrays as defined by matrix subtraction. In matrix
      * addition, the corresponding entries of multiple matrices are summed to 
      * form the resultant entry. As a direct consequence, the arrays must be of
      * the same dimensions.
-     * @param 
-     * @return 
+     * @param A the arrays to be summed
+     * @return an array representing the sum of the arrays by matrix addition
      */
     public static double[][] add(double[][]... A) {
-        int m = A.length;
-        int n = A[0].length;
+        int m = A[0].length;
+        int n = A[0][0].length;
         double[][] C = new double[m][n];
         for (double[][] arr : A) {
             for (int i = 0 ; i < m ; i++) {
@@ -88,7 +117,14 @@ public class MatrixMath {
         return C;
     }
 
-    // return C = A - B
+    /**
+     * Returns the sum of arrays as defined by matrix addition. In matrix
+     * addition, the corresponding entries of multiple matrices are summed to 
+     * form the resultant entry. As a direct consequence, the arrays must be of
+     * the same dimensions.
+     * @param A the arrays to be summed
+     * @return an array representing the sum of the arrays by matrix addition
+     */
     public static double[][] subtract(double[][] A, double[][] B) {
         int m = A.length;
         int n = A[0].length;
@@ -99,7 +135,7 @@ public class MatrixMath {
         return C;
     }
 
-    // return C = A * B
+    // matrix-matrix multiplication (C = A * b)
     public static double[][] multiply(double[][] A, double[][] B) {
         int mA = A.length;
         int nA = A[0].length;
@@ -138,7 +174,7 @@ public class MatrixMath {
         return y;
     }
 
-
+    
     // vector-matrix multiplication (y = x^T A)
     public static double[] multiply(double[] x, double[][] A) {
         int m = A.length;
@@ -151,3 +187,7 @@ public class MatrixMath {
         return y;
     }
 }
+/*
+Copyright © 2000–2011, Robert Sedgewick and Kevin Wayne. 
+Last updated: Wed Feb 11 14:17:51 EST 2015.
+*/
