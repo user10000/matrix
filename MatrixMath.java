@@ -3,10 +3,23 @@ package matrix.matrix;
 /**
  * Provides a collection of methods to manipulate arrays as matrices. A 
  * <i>matrix</i> is defined to be a rectangular array of numbers (which can be
- * represented as Number[][]). The size of the array is known as the
- * <i>order</i> of the matrix, denoted m x n, where m is the amount of rows and
- * n the columns. Each element of a matrix is known as an <i>entry</i>,
- * accessible by its unique row and column, also known as the entry's order.
+ * represented as Number[][], or as used here, double[][]). 
+ * 
+ * <p>A, B, C... are often used to refer to matrices. They are typically bolded
+ * in printed text, but for brevity will not be in this documentation.
+ * 
+ * <p>The size of the matrix is known as the <i>order</i> of the matrix, 
+ * describing its number of rows and columns.
+ * 
+ * <p> m and n are often used to refer to the order of matrices, where m x n 
+ * denotes the m rows and n columns of a matrix.
+ * 
+ * <p>Each element of a matrix is known as an <i>entry</i>,
+ * accessible by its unique row and column, also known as the <i>entry's order.</i>
+ * 
+ * <p>a is often used to denote an entry, and i and j the entry's order (put 
+ * together to form a sub ij).
+ *
  * @author Robert Sedgewick and Kevin Wayne
  */
 public class MatrixMath {
@@ -57,7 +70,7 @@ public class MatrixMath {
      * In vectors, the dot product is the scalar sum of the products of 
      * each of the corresponding entries in multiple arrays.
      * @param x the vectors to calculate the dot product of
-     * @return the dot product of the arrays (denoted xA · xB)
+     * @return the dot product of the vectors (denoted A · B)
      */
     public static double dot(double[]... x) {
         int m = x.length;
@@ -79,9 +92,13 @@ public class MatrixMath {
     }
 
     /**
-     * Returns an array representing the transposition of the specified
-     * matrix. The transposition of of a matrix is defined to be the matrix
-     * whose rows represent the columns of the original matrix.
+     * Returns an array representing the transposition of the specified matrix. 
+     * 
+     * <p>The <i>transposition of a matrix</i> is defined to be the matrix whose 
+     * rows represent the columns of the original matrix. Equivalently, the 
+     * the columns representing the rows of the original; colloquially, the 
+     * matrix is "reflected" across its main diagonal (where the entries' row 
+     * and column order are equal).
      * @param A the array to be transposed
      * @return the transposition of an array ( denoted A^T)
      */
@@ -96,10 +113,10 @@ public class MatrixMath {
     }
 
     /**
-     * Returns an array representing the sum of multiple matrices. In matrix
-     * addition, the corresponding entries of multiple matrices are summed to 
-     * form the resultant entry. As a direct consequence, the arrays must be of
-     * the same order.
+     * Returns an array representing the sum of multiple matrices. 
+     * In matrix addition, the corresponding entries of multiple matrices are 
+     * summed to form the resultant entry. As a direct consequence, the arrays 
+     * must be of the same order.
      * @param A the addend arrays representing matrices
      * @return the sum of the matrices (denoted A + B)
      */
@@ -118,10 +135,11 @@ public class MatrixMath {
     }
 
     /**
-     * Returns an array representing the difference of multiple matrices. In matrix
-     * subtraction, the corresponding entries of multiple matrices are subtracted to 
-     * form the resultant entry. As a direct consequence, the arrays must be of
-     * the same order.
+     * Returns an array representing the difference of multiple matrices. 
+     * 
+     * <p>In matrix subtraction, the corresponding entries of multiple matrices 
+     * are subtracted to form the resultant entry. As a direct consequence, the 
+     * arrays must be of the same order.
      * @param A the minuend array representing a matrix
      * @param B the subtrahend array representing a matrix
      * @return the difference of the two matrices (denoted A - B)
@@ -137,11 +155,13 @@ public class MatrixMath {
     }
 
     /**
-     * Returns an array representing the product of two matrices.  In matrix 
-     * multiplication, the resultant entry sub ij is equal to the scalar 
-     * (dot) product of the ith row of the initial matrix and jth column of
-     * the terminal. As a direct consequence, the column order of the intial
-     * array must be equal to equal to the row order of the terminal.
+     * Returns an array representing the product of two matrices.  
+     * 
+     * <p>In matrix multiplication, the resultant entry sub ij is equal to the 
+     * scalar (dot) product of the ith row of the initial matrix and jth column 
+     * of the terminal. As a direct consequence, the column order of the initial
+     * array must be equal to the row order of the terminal. The 
+     * resultant matrix will be of order Bm x An.
      * @param A the initial array representing a matrix
      * @param B the terminal array representing a matrix
      * @return the product of the two matrices (denoted AB)
@@ -162,7 +182,8 @@ public class MatrixMath {
     
     /**
      * Returns an array representing the product of a scalar and a matrix.
-     * Each entry of the matrix is multiplied by the scalar.
+     * 
+     * <p>Each entry of the matrix is multiplied by the scalar.
      * @param k a scalar
      * @param A an array representing a matrix
      * @return the product of the scalar and the array (denoted kA)
@@ -178,7 +199,20 @@ public class MatrixMath {
         
     }
     
-    // matrix-vector multiplication (y = A * x)
+    /**
+     * Returns an array representing the product of a matrix and a vector. 
+     * <p>This is equivalent to multiplying a matrix and a 1 x n matrix. As a 
+     * direct consequence, the column order of the initial array must be equal 
+     * to the order (number of elements) of the vector.
+     * 
+     * <p>Note that this returns a vector. This can easily be converted to a 
+     * matrix by (1) creating a 2D array and using the result of the
+     * multiplication as the sole row or (2) using
+     * {@link MatrixMath.vectorToMatrix(double[]).}
+     * @param A an array representing a matrix
+     * @param x an array representing a vector
+     * @return the product of a matrix and a vector
+     */
     public static double[] multiply(double[][] A, double[] x) {
         int m = A.length;
         int n = A[0].length;
@@ -189,9 +223,18 @@ public class MatrixMath {
                 y[i] += (A[i][j] * x[j]);
         return y;
     }
-
     
-    // vector-matrix multiplication (y = x^T A)
+    /**
+     * Returns an array representing the product of a vector and a matrix.
+     * 
+     * <p>In contrast to {@link multiply(double[][] A, x is now considered a 
+     * columnar matrix (there is no sense of row/column in a typical vector). 
+     * As a direct consequence, the order of the vector must be equal to the 
+     * column order of the matrix.
+     * @param x an array representing a vector
+     * @param A an array representing a matrix
+     * @return the product of a vector and a matrix
+     */
     public static double[] multiply(double[] x, double[][] A) {
         int m = A.length;
         int n = A[0].length;
