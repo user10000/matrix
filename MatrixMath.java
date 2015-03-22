@@ -1,4 +1,4 @@
-package matrix.matrix;
+package matrix;
 
 /**
  * Provides a collection of methods to manipulate arrays as matrices. A 
