@@ -67,8 +67,12 @@ public class MatrixMath {
 
     /**
      * Returns the dot product of multiple arrays as defined by vectors.
-     * In vectors, the dot product is the scalar sum of the products of 
+     * <p>In vectors, the dot product is the scalar sum of the products of 
      * each of the corresponding entries in multiple arrays.
+     * 
+     * <p>The dot product is also known as the <i>scalar</i> product, as it 
+     * is a meaningful comparison of vectors one-dimensionally (i.e., by a 
+     * scalar).
      * @param x the vectors to calculate the dot product of
      * @return the dot product of the vectors (denoted A · B)
      */
@@ -135,9 +139,9 @@ public class MatrixMath {
     }
 
     /**
-     * Returns an array representing the difference of multiple matrices. 
+     * Returns an array representing the difference of two matrices. 
      * 
-     * <p>In matrix subtraction, the corresponding entries of multiple matrices 
+     * <p>In matrix subtraction, the corresponding entries of two matrices 
      * are subtracted to form the resultant entry. As a direct consequence, the 
      * arrays must be of the same order.
      * @param A the minuend array representing a matrix
@@ -244,6 +248,10 @@ public class MatrixMath {
             for (int i = 0; i < m; i++)
                 y[j] += (A[i][j] * x[i]);
         return y;
+    }
+    
+    public static double determinant(double[][] A) {
+        return 2;
     }
 }
 /*
