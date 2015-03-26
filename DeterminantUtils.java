@@ -36,10 +36,10 @@ class DeterminantUtils {
     }
 
     public static double negOnePow(int exp) {
-        return  (1 & exp) << 1 - 1;
+        return  ((1 & exp) << 1) - 1;
     }
     
-    public static double determinantRowReduction() {
-        return 0;
+    public static double determinantRowReduction(Matrix M) {
+        return Double.NaN;
     }
 }

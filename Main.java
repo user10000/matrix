@@ -17,13 +17,22 @@ public class Main {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        double[][] arr = MatrixMath.random(2,2);
+        double[][] M = {
+            {1, 2, 3}
+        };
         
-        Matrix m = new Matrix(1, 1, 1);
+        double[] vec = {1, 2, 3};
         
-        m = new Matrix(arr);
-        System.out.println(m);
-        System.out.println(DeterminantUtils.determinantRecursive(m));
+        Vector v = new Vector(vec);
+        
+        Matrix A = new Matrix(M);
+        
+        System.out.println(A.order);
+        System.out.println(v.order);
+        System.out.println(A.plus(v));
+        System.out.println(v.plus(A));
+        Vector c = v.plus(A);
+        
     }
     
 }

@@ -9,18 +9,21 @@ import java.util.Arrays;
 import java.util.Objects;
 
 /**
- * A rectangular array of numbers.
+ * A rectangular array of scalars.
  *
  * <p>
  * Note that index counting in matrices is traditionally one-based. This
- * convention is respected in all methods in this class.
+ * convention is respected by all methods in this class.
+ * 
+ * <p>
+ * This class's implementation of matrix manipulation (arithmetic and 
  *
  * @author Thurman
  */
 public class Matrix {
 
     /**
-     * The internal array storing the elements of the matrix.
+     * The internal 2D array storing the elements of the matrix.
      */
     double[][] matrix;
 
@@ -30,7 +33,7 @@ public class Matrix {
     Order order;
 
     /**
-     * Constructs a matrix based on the specified array.
+     * Constructs a matrix based on the specified 2D array.
      *
      * @param arr a double 2D array representing a matrix
      */
@@ -92,9 +95,18 @@ public class Matrix {
      * @param order
      */
     public Matrix(double[][] arr, Order order) {
-        matrix = ArrayUtils.resize(matrix, order.row, order.col);
+        matrix = ArrayUtils.resize(arr, order.row, order.col);
         this.matrix = matrix;
         this.order = order;
+    }
+    
+    /**
+     * Constructs a matrix based on another matrix.
+     * @param M the matrix to copy
+     */
+    public Matrix(Matrix M) {
+        this.matrix = M.matrix.clone();
+        this.order = new Order(M.order);
     }
     
     /**
@@ -103,12 +115,14 @@ public class Matrix {
      * <p>
      * It is <b>strongly</b> recommended that this method be used rather than
      * directly manipulating the array (except in the constructor).
-     *
+     * 
+     * <p>
+     * Note that these methods are for internal use only.
      * @param M the matrix for this to change to
      */
-    void setMatrix(Matrix M) {
+    private void setMatrix(Matrix M) {
         this.matrix = M.matrix;
-        this.order = new Order(M.order);
+        this.order = M.order;
     }
     
     /**
@@ -120,7 +134,7 @@ public class Matrix {
      *
      * @param arr a double 2D array representing a matrix
      */
-    void setMatrix(double[][] arr) {
+    private void setMatrix(double[][] arr) {
         setMatrix(arr, new Order(arr));
     }
     
@@ -135,7 +149,7 @@ public class Matrix {
      * @param row the number of rows of the new matrix
      * @param col the number of columns of the new matrix
      */
-    void setMatrix(double[][] arr, int row, int col) {
+    private void setMatrix(double[][] arr, int row, int col) {
         setMatrix(arr, new Order(row, col));
     }
     
@@ -148,7 +162,7 @@ public class Matrix {
      *
      * @param arr a double 2D array representing a matrix
      */
-    void setMatrix(double[][] arr, Order order) {
+    private void setMatrix(double[][] arr, Order order) {
         setMatrix(new Matrix(arr, order));
     }
 
@@ -242,7 +256,7 @@ public class Matrix {
      * Returns the sum of this and another matrix.
      * 
      * @param M a matrix of the same order
-     * @return sum the sum of this and the argument matrix
+     * @return the sum of this and the argument matrix
      */
     public Matrix plus(Matrix M) {
         if (! this.orderEquals(M)) throw new IllegalArgumentException();
@@ -268,9 +282,9 @@ public class Matrix {
      * Returns the difference of this and another matrix.
      * 
      * @param M a matrix of the same order
-     * @return diff the difference of this and the argument matrix 
+     * @return the difference of this and the argument matrix 
      */
-    public Matrix  minus(Matrix M) {
+    public Matrix minus(Matrix M) {
         if (! this.orderEquals(M)) throw new IllegalArgumentException();
         Matrix diff = new Matrix(rows(), cols());
         for (int r = 0; r < rows(); r++) {
@@ -314,18 +328,14 @@ public class Matrix {
      * @param k a scalar
      */
     public void multiply(double k) {
-        for (int r = 0; r < order.row; r++) {
-            for (int c = 0; c < order.col; c++) {
-                matrix[r][c] *= k;
-            }
-        }
+        setMatrix(this.times(k));
     }
     
     /**
      * Sets this matrix to the product of itself and a specified scalar.
      *
      * @param k a scalar
-     * @return product the product of this and the scalar
+     * @return the product of this and the scalar
      */
     public Matrix times(double k) {
         Matrix product = new Matrix(this.rows(), this.cols());
@@ -335,6 +345,19 @@ public class Matrix {
             }
         }
         return product;
+    }
+    
+    public Vector row(int row) {
+        return new Vector(matrix[row - 1]);
+    }
+    
+    /**
+     * @
+     * @param col
+     * @return 
+     */
+    public Vector col(int col) {
+        return null;
     }
     
     /**
@@ -370,6 +393,41 @@ public class Matrix {
             matrix[row1][c] += k * matrix[row2][c];
         }
     }
+       
+    /**
+     * Performs the first matrix column operation : swapping two 
+     * columns.
+     * @param col1 a column to swap
+     * @param col2 a column to swap
+     */
+    public void c1(int col1, int col2) {
+        ArrayUtils.swap(matrix, col1, col2);
+    }
+    
+    /**
+     * Performs the second matrix column operation : multiplying a 
+     * column by a (nonzero) constant.
+     * @param col1 the column to multiply
+     * @param k a constant to multiply by
+     */
+    public void c2(int col1, double k) {
+        for (int c = 0 ; c < order.col ; c++) {
+            matrix[col1][c] *= k;
+        }
+    }
+    
+    /**
+     * Performs the third column operation : adding a (nonzero) 
+     * multiple of a column to another.
+     * @param col1 the column to add to
+     * @param col2 the column whose multiple is to be added
+     * @param k a constant to multiply the addend by
+     */
+    public void c3(int col1, int col2, double k) {
+        for (int c = 0; c < order.col; c++) {
+            matrix[col1][c] += k * matrix[col2][c];
+        }
+    }   
     
     /**
      * Transposes this matrix.
@@ -393,6 +451,10 @@ public class Matrix {
         return new Matrix(arr);
     }
      
+    public Matrix ref() {
+        return null;
+    }
+    
     /**
      * Returns the determinant of this matrix.
      *
@@ -489,27 +551,36 @@ public class Matrix {
         return cofactorM;
     }
     
+    /**
+     * Returns the adjugate of this matrix.
+     * 
+     * <p>The adjugate matrix [A] has such a property that when multiplied by
+     * the determinant |M| of the original square invertible matrix, it will 
+     * equal M^-1, the inverse of M.
+     * @return 
+     */
     public Matrix adjugate() {
         return cofactorMatrix().transposition();
     }
+    
     /**
-     * Checks if the order - that is, the size - of this matrix is equal to
-     * another's.
+     * Checks if the order - that is, the size - of this matrix is equal 
+     * to another's.
      *
      * @param row a matrix to compare this to
      * @return {@code true} if and only if the order of the matrix is equal the
      * argument's and {@code false} otherwise
      */
-    public boolean orderEquals(Matrix row) {
-        return this.order().equals(row.order());
+    public boolean orderEquals(Matrix M) {
+        return this.order.equals(M.order);
     }
 
     /**
      * Checks if two matrices are equal.
      *
      * <p>
-     * Two matrices are defined to be equal if and only if their elements are
-     * identical.
+     * Two matrices are defined to be equal if and only if their corresponding 
+     * elements are equivalent, and no other elements exist.
      *
      * @param o an object to equate this to
      * @return {@code true} if and only if this is equal to the argument and
