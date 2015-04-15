@@ -5,39 +5,43 @@
  */
 package matrix;
 
+import java.util.Objects;
+
 /**
- * Represents the dimensions (row and column size) of a matrix or 
- * entry.
+ * Represents the dimensions (rows and column size) of a matrix or 
+ entry.
  */
-public class Order {
+public class Order implements Cloneable {
 
     /**
-     * The number of rows of the matrix represented by this order.
+     * The rows dimension.
      */
-    final int row;
+    final int rows;
 
     /**
-     * The number of columns of the matrix represented by this order.
+     * The column dimension.
      */
-    final int col;
+    final int cols;
 
     /**
-     * Constructs an order with the specified row and column.
+     * Constructs an order with the specified rows and columns.
      *
      * @param row the rows of the matrix
      * @param col the columns of the matrix
      */
     public Order(int row, int col) {
-        this.row = row;
-        this.col = col;
+        this.rows = row;
+        this.cols = col;
     }
     
     /**
      * Constructs an order based on the given 2D array.
      * @param arr a 2D array
      */
-    public Order(double[][] arr) {
-         this(arr.length, arr[ArrayUtils.maxRow(arr)].length);
+    public Order(double[][] arr) {       
+        Objects.requireNonNull(arr);
+        this.rows = arr.length;
+        this.cols = ArrayUtils.maxRow(arr);
     }
     
     /**
@@ -45,8 +49,9 @@ public class Order {
      * @param order the order to copy
      */
     public Order(Order order) {
-        this.row = order.row;
-        this.col = order.col;
+        
+        this.rows = order.rows;
+        this.cols = order.cols;
     }
 
     /**
@@ -60,7 +65,7 @@ public class Order {
      * false} otherwise
      */
     public boolean equals(Order o) {
-        return this.row == o.row && this.col == o.col;
+        return this.rows == o.rows && this.cols == o.cols;
     }
     
     /**
@@ -83,14 +88,14 @@ public class Order {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 17 * hash + this.row;
-        hash = 17 * hash + this.col;
+        hash = 17 * hash + this.rows;
+        hash = 17 * hash + this.cols;
         return hash;
     }
     
     @Override
     public String toString() {
-        return String.format("%s x %s", row, col);
+        return String.format("%s x %s", rows, cols);
     }
     
     /**
@@ -99,6 +104,11 @@ public class Order {
      * @return 
      */
     public Order inverse() {
-        return new Order(this.col, this.row);
+        return new Order(this.cols, this.rows);
+    }
+    
+    @Override
+    public Order clone() throws CloneNotSupportedException {
+        return new Order(this);
     }
 }

@@ -5,8 +5,6 @@
  */
 package matrix;
 
-import java.util.Arrays;
-
 /**
  * A list of a scalars which represent a path in a space (known
  * as a <i>vector space</i>).
@@ -15,6 +13,8 @@ import java.util.Arrays;
  * @author Guest
  */
 public class Vector extends Matrix {
+    
+    double[] vec;
     
     /**
      * Constructs a vector based on the specified array.
@@ -25,7 +25,7 @@ public class Vector extends Matrix {
     }
     
     /**
-     * Constructs a zero vector based on the specified dimension.
+     * Constructs a zero vector based on the specified dimensions.
      * @param dimension the number of scalars representing this vector
      */
     public Vector(int dimension) {
@@ -34,7 +34,7 @@ public class Vector extends Matrix {
    
     /**
      * Constructs a vector filled with the specified element and of the
-     * specified dimension
+     * specified dimensions.
      * @param a the element to fill this vector
      * @param dimension the number of scalars representing this vector
      */
@@ -43,34 +43,39 @@ public class Vector extends Matrix {
     }
     
     /**
-     * Constructs a vector based on the specified array and dimension.
+     * Constructs a vector based on the specified array and dimensions.
      * 
      * @param arr an array of doubles representing a vector
      * @param dimension the number of scalars representing this vector
      */
     public Vector(double[] arr, int dimension) {
         super(ArrayUtils.extend(arr), new Order(1, dimension));
+        this.vec = matrix[0];
     }    
     
-    /**
-     * Returns the dimension of this vector.
-     * @return the number of scalars representing this vector
-     */
-    public int dimension() {
-        return order.row;
+    public Vector(Vector v) {
+        this(v.vec, v.length());
     }
     
     /**
-     * Changes this vector and dimension.
+     * Returns the dimensions of this vector.
+     * @return the number of scalars representing this vector
+     */
+    public int length() {
+        return order.rows;
+    }
+    
+    /**
+     * Changes this vector and and its dimensions.
      * 
      * @param v the vector for this to change to
      */
-    public void setVector(Vector v) {
-        matrix[0] = v.vec;
+    private void setVector(Vector v) {
+        this.vec = v.vec;
     }
     
     /**
-     * Returns a vector representing this in the specified dimension.
+     * Returns a vector representing this in the specified dimensions.
      * 
      * @param dimension the number of scalars to represent this vector
      * @return a vector representing this in another dimension
@@ -85,7 +90,7 @@ public class Vector extends Matrix {
      * @return the magnitude in a certain dimension
      */
     public double entry(int col) {
-        return super.entry(1, col);
+        return super.getEntry(1, col);
     }
     
     /**
@@ -106,12 +111,12 @@ public class Vector extends Matrix {
     /**
      * Returns the sum of this and another vector.
      * 
-     * @param v a vector of the same order
-     * @return sum the sum of this and the argument vector
+     * @param v a vector of the same getOrder
+     * @return the sum of this and the argument vector
      */
     @Override
     public Vector plus(Matrix M) {
-        return super.plus(M).row(1);
+        return super.plus(M).getRow(1);
     }
     
     /**
@@ -125,17 +130,34 @@ public class Vector extends Matrix {
     }
     
     /**
-     * Returns the difference of this and another vector
+     * Returns the difference of this and another vector.
      * 
      * @return the difference of this and the argument vector 
      */
     @Override
     public Vector minus(Matrix M) {
-        return super.minus(M).row(1);
+        return super.minus(M).getRow(1);
     }
     
-    public void dot(Vector v) {
-        
+    /**
+     * Returns the dot product of this and another vector.
+     * 
+     * <p>
+     * This is equivalent to the product of two one-dimensional matrices
+     * ({@link Matrix#multiply(Matrix M)}) expressed as a scalar.
+     * @param v
+     * @return 
+     */
+    public double dot(Vector v) {
+        return MatrixMath.dot(this.vec, v.vec);
+    }
+    
+    public Vector times(double k) {
+        Vector vec = new Vector(this);
+        for (int i = 0 ; i < this.length() ; i++) {
+            this.vec[i] *= k;
+        }
+        return vec;
     }
     
     /**
@@ -145,5 +167,14 @@ public class Vector extends Matrix {
      */
     public boolean dimensionEquals(Vector v) {
         return this.order.equals(v.order);
+    }
+    
+    /**
+     * Checks if the specified matrix is a vector.
+     * @param M a matrix
+     * @return {@code true} if a specified matrix is a vector
+     */
+    public boolean isVector(Matrix M) {
+        return M.getRows() == 1;
     }
 }

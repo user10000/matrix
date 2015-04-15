@@ -21,18 +21,16 @@ public class Main {
             {1, 2, 3}
         };
         
-        double[] vec = {1, 2, 3};
-        
-        Vector v = new Vector(vec);
+        double[][] v = {{1, 2, 69}};
+        Matrix B = new Matrix(v);
         
         Matrix A = new Matrix(M);
         
         System.out.println(A.order);
-        System.out.println(v.order);
-        System.out.println(A.plus(v));
-        System.out.println(v.plus(A));
-        Vector c = v.plus(A);
-        
+        System.out.println(B.order);
+        System.out.println(A.plus(B));
+        System.out.println(B.plus(A));
+       
     }
     
 }

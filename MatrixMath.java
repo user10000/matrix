@@ -3,23 +3,7 @@ package matrix;
 /**
  * Provides a collection of methods to manipulate arrays as matrices. A 
  * <i>matrix</i> is defined to be a rectangular array of numbers (which can be
- * represented as Number[][], or as used here, double[][]). 
- * 
- * <p>A, B, C... are often used to refer to matrices. They are typically bolded
- * in printed text, but for brevity will not be in this documentation.
- * 
- * <p>The size of the matrix is known as the <i>order</i> of the matrix, 
- * describing its number of rows and columns.
- * 
- * <p> m and n are often used to refer to the order of matrices, where m x n 
- * denotes the m rows and n columns of a matrix.
- * 
- * <p>Each element of a matrix is known as an <i>entry</i>,
- * accessible by its unique row and column, also known as the <i>entry's order.</i>
- * 
- * <p>a is often used to denote an entry, and i and j the entry's order (put 
- * together to form a sub ij).
- *
+ * represented as Number[][], or as in this class, double[][]). 
  * @author Robert Sedgewick and Kevin Wayne
  */
 public class MatrixMath {

@@ -5,6 +5,7 @@
  */
 package matrix;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 
 /**
@@ -50,6 +51,13 @@ class ArrayUtils {
         return fArr;
     }
     
+    public static<T> T[] fill(T entry, int size) {
+        T[] arr = (T[]) Array.newInstance(entry.getClass(), size);
+        Arrays.fill(arr, entry);
+        return arr;
+    }
+ 
+    
     /**
      * Returns an array representing the resizing of another to the 
      * specified dimensions.
@@ -57,7 +65,8 @@ class ArrayUtils {
      * @param m the rows of the resized array
      * @param n the columns of the resized array
      * @return an array with a specified size containing the corresponding
-     * elements in another array, or zero if they do not exist
+     * elements of another array, removing elements if necessary, and
+     * zero if the elements do not exist
      */
     public static double[][] resize(double[][] arr, int m, int n) {
         double[][] tArr = new double[m][n];
@@ -92,16 +101,22 @@ class ArrayUtils {
         return maxRow;
     }
     
+    public static int maxRowLen(Object[]... arr) {
+        return arr[maxRow(arr)].length;
+    }
+    
     /**
      * Swaps two objects in an array.
      * @param arr the array to swap in
      * @param index1 an index of an element to swap
      * @param index2 an index of an element to swap
      */
-    public static void swap(Object[] arr, int index1, int index2) {
-        Object temp = arr[index1];
+    public static<T> T[] swap(T[] arr, int index1, int index2) {
+        arr = arr.clone();
+        T temp = arr[index1];
         arr[index1] = arr[index2];
         arr[index2] = temp;
+        return arr;
     }
     
     /**

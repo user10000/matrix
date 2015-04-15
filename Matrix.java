@@ -7,6 +7,8 @@ package matrix;
 
 import java.util.Arrays;
 import java.util.Objects;
+import static console.print.Printer.*;
+import java.util.ArrayList;
 
 /**
  * A rectangular array of scalars.
@@ -14,13 +16,14 @@ import java.util.Objects;
  * <p>
  * Note that index counting in matrices is traditionally one-based. This
  * convention is respected by all methods in this class.
- * 
- * <p>
- * This class's implementation of matrix manipulation (arithmetic and 
  *
+ * <p>
+ * Methods in this class do not permit {@code null} values.
  * @author Thurman
  */
 public class Matrix {
+
+    static final double DEFAULT_VALUE = 0.0;
 
     /**
      * The internal 2D array storing the elements of the matrix.
@@ -28,151 +31,185 @@ public class Matrix {
     double[][] matrix;
 
     /**
-     * The order of the matrix (which contains its number of rows and columns).
+     * The getOrder of the matrix (which contains its number of getRows and
+ columns).
      */
     Order order;
-
+    
+    void init() {
+        
+    }
+    
+    /**
+     * Checks the initial restrictions of the construction of a matrix are
+     * satisfied. It is designed to be overridden so as to allow subclasses to
+     * delineate restrictions of that class's specific implementation of 
+     * {@code Matrix}.
+     * @param arr 
+     * @throws java.lang.NullPointerException - if any row of the matrix is 
+     * {@code null}
+     */
+    protected void init(double[][] arr) {
+        requireNonNullParams((Object[]) arr);
+    }
+    
+    protected void init(Order order) {
+        requireNonNullParams(order);
+    }
+    protected void init(double[][] arr, Order order) {
+        requireNonNullParams(arr, order);
+    }
+    
+    protected void init(Matrix M) {
+        requireNonNullParams(M);
+    }
+    
     /**
      * Constructs a matrix based on the specified 2D array.
      *
-     * @param arr a double 2D array representing a matrix
+     * @param arr a double 2D array forming this matrix
      */
     public Matrix(double[][] arr) {
-        this(arr, arr.length, arr[ArrayUtils.maxRow(arr)].length);
-    }
-    
-    /**
-     * Constructs a zero matrix based the specified order.
-     *
-     * @param row the rows of the matrix
-     * @param col the columns of the matrix
-     */
-    public Matrix(int row, int col) {
-        this(new Order(row, col));
+        init(arr);
+        this.order = new Order(arr.length, ArrayUtils.maxRowLen(arr));
+        this.matrix = ArrayUtils.resize(arr, order.rows, order.cols);
     }
 
-    public Matrix(Order order) {
-        this.matrix = new double[order.row][order.col];
-        this.order = order;
+    /**
+     * Constructs a zero matrix based on the specified getRows and columns.
+     *
+     * @param rows the getRows of the matrix
+     * @param cols the columns of the matrix
+     */
+    public Matrix(int rows, int cols) {
+        this(new Order(rows, cols));
     }
-    
+
+    /**
+     * Constructs a zero matrix based on the specified getOrder.
+     *
+     * @param order the getOrder of the matrix
+     */
+    public Matrix(Order order) {
+        init(order);
+        this.matrix = new double[order.rows][order.cols];
+        this.order = new Order(order.rows, order.cols);
+    }
+
     /**
      * Constructs a matrix filled with the specified entry and of the specified
      * order.
      *
-     * @param entry the entry to fill the matrix with
-     * @param row the number of rows of the matrix
-     * @param col the number of columns of the matrix
+     * @param entry the getEntry to fill this matrix with
+     * @param rows the number of rows of this matrix
+     * @param cols the number of columns of this matrix
      */
-    public Matrix(double entry, int row, int col) {
-        this.matrix = ArrayUtils.fill(row, col, entry);
-        order = new Order(row, col);
+    public Matrix(double entry, int rows, int cols) {
+        this(entry, new Order(rows, cols));
     }
-
+    
+    public Matrix(double entry, Order order) {
+        this.matrix = ArrayUtils.fill(order.rows, order.cols, entry);
+        this.order = new Order(order);
+    }
+    
     /**
-     * Constructs a matrix based on the specified array and order.
+     * Constructs a matrix based on the specified array and getOrder.
      *
      * <p>
-     * If the order is not equivalent to the array's order, truncation will
-     * begin from the end row and column of the array.
+     * If the getOrder is not equivalent to the array's getOrder, truncation
+     * will begin from the end getRow and column of the array.
      *
      * @param arr
-     * @param row
-     * @param col
+     * @param rows
+     * @param cols
      */
-    public Matrix(double[][] arr, int row, int col) {
-        this(arr, new Order(row, col));
+    public Matrix(double[][] arr, int rows, int cols) {
+        requireNonNullParams((Object) arr);
+        this.order = new Order(rows, cols);
+        this.matrix = ArrayUtils.resize(arr, order.rows, order.cols);
+
     }
 
     /**
-     * Constructs a matrix based on the specified array and order.
+     * Constructs a matrix based on the specified array and getOrder.
      *
      * <p>
-     * If the order is not equivalent to the array's actual order, truncation
-     * will begin from the end row and column of the array.
+     * If the getOrder is not equivalent to the array's actual getOrder,
+     * truncation will begin from the end getRow and column of the array.
      *
      * @param arr
      * @param order
      */
     public Matrix(double[][] arr, Order order) {
-        matrix = ArrayUtils.resize(arr, order.row, order.col);
-        this.matrix = matrix;
+        init(arr, order);
+        this.matrix = ArrayUtils.resize(arr, order.rows, order.cols);
         this.order = order;
-    }
-    
-    /**
-     * Constructs a matrix based on another matrix.
-     * @param M the matrix to copy
-     */
-    public Matrix(Matrix M) {
-        this.matrix = M.matrix.clone();
-        this.order = new Order(M.order);
-    }
-    
-    /**
-     * Changes the matrix and order.
-     *
-     * <p>
-     * It is <b>strongly</b> recommended that this method be used rather than
-     * directly manipulating the array (except in the constructor).
-     * 
-     * <p>
-     * Note that these methods are for internal use only.
-     * @param M the matrix for this to change to
-     */
-    private void setMatrix(Matrix M) {
-        this.matrix = M.matrix;
-        this.order = M.order;
-    }
-    
-    /**
-     * Changes the matrix and order.
-     *
-     * <p>
-     * It is <b>strongly</b> recommended that this method be used rather than
-     * directly manipulating the array (except in the constructor).
-     *
-     * @param arr a double 2D array representing a matrix
-     */
-    private void setMatrix(double[][] arr) {
-        setMatrix(arr, new Order(arr));
-    }
-    
-    /**
-     * Changes the matrix and order.
-     *
-     * <p>
-     * It is <b>strongly</b> recommended that this method be used rather than
-     * directly manipulating the array (except in the constructor).
-     *
-     * @param arr a double 2D array representing a matrix
-     * @param row the number of rows of the new matrix
-     * @param col the number of columns of the new matrix
-     */
-    private void setMatrix(double[][] arr, int row, int col) {
-        setMatrix(arr, new Order(row, col));
-    }
-    
-    /**
-     * Changes the matrix and order.
-     *
-     * <p>
-     * It is <b>strongly</b> recommended that this method be used rather than
-     * directly manipulating the array (except in the constructor).
-     *
-     * @param arr a double 2D array representing a matrix
-     */
-    private void setMatrix(double[][] arr, Order order) {
-        setMatrix(new Matrix(arr, order));
     }
 
     /**
-     * Returns the number of rows of the matrix.
+     * Constructs a matrix based on another matrix.
+     *
+     * @param M the matrix to copy
+     */
+    public Matrix(Matrix M) {
+        init(M);
+        this.matrix = M.matrix.clone();
+        this.order = new Order(M.order);
+    }
+
+    /**
+     * Changes the matrix and getOrder without performing the rigorous tests of
+     * the constructors.
+     *
+     * <p>
+     * Note that this method and any overloaded variants are for internal use
+     * only.
+     *
+     * @param M the matrix for this to change to
+     */
+    private void internalUncheckedSet(double[][] arr) {
+        internalUncheckedSet(arr, new Order(arr.length, arr[0].length));
+    }
+
+    /**
+     * Changes the matrix and getOrder without performing the rigorous tests of
+     * the constructors.
+     *
+     * <p>
+     * Note that this method and any overloaded variants are for internal use
+     * only.
+     *
+     * @param M the matrix for this to change to
+     */
+    private void internalUncheckedSet(Matrix M) {
+        internalUncheckedSet(M.matrix, M.order);
+    }
+
+    /**
+     * Changes the matrix and getOrder without performing the rigorous tests of
+     * the constructors.
+     *
+     * <p>
+     * Note that this method and any overloaded variants are for internal use
+     * only.
+     *
+     * @param M the matrix for this to change to
+     */
+    private void internalUncheckedSet(double[][] arr, Order order) {
+        Objects.requireNonNull(arr);
+        Objects.requireNonNull(order);
+        this.matrix = arr;
+        this.order = order;
+    }
+
+    /**
+     * Returns the number of rows of this matrix.
      *
      * @return the number of columns of this matrix.
      */
-    public int rows() {
-        return order.row;
+    public int getRows() {
+        return order.rows;
     }
 
     /**
@@ -180,157 +217,218 @@ public class Matrix {
      *
      * @return the number of columns of this matrix.
      */
-    public int cols() {
-        return order.col;
+    public int getCols() {
+        return order.cols;
     }
 
     /**
-     * Returns the order representing the size of this matrix.
+     * Returns the getOrder representing the size of this matrix.
      *
      * <p>
-     * Note that although the fields of the order are publicly accessible, they
-     * cannot be changed.
+     * Note that although the fields of the getOrder are publicly accessible,
+     * they cannot be changed.
      *
-     * @return the order representing the size of this matrix
+     * @return the getOrder representing the size of this matrix
      */
-    public Order order() {
+    public Order getOrder() {
         return this.order;
     }
-
+    
     /**
-     * Returns the entry at the specified order.
-     *
-     * @param order the location of the entry
-     * @return the targeted entry in the matrix
-     */
-    public double entry(Order order) {
-        return entry(order.row, order.col);
-    }
-
-    /**
-     * Returns the entry at the specified order.
+     * Returns the entry at the specified getOrder.
      *
      * <p>
      * Note that index counting in matrices is traditionally one-based. This
      * convention is respected in all methods in this class.
      *
-     * @param row the row of the entry
-     * @param col the column of the entry
-     * @return the targeted entry in the matrix
+     * @param row the getRow of the getEntry
+     * @param col the column of the getEntry
+     * @return the targeted getEntry in the matrix
      */
-    public double entry(final int row, final int col) {
+    public double getEntry(final int row, final int col) {
         return this.matrix[row - 1][col - 1];
     }
-
+    
     /**
-     * Sets the entry at the specified order to a specified value.
+     * Returns the getEntry at the specified getOrder.
      *
-     * @param order the desired location for the entry
-     * @param a the value to set the entry to
+     * @param order the location of the getEntry
+     * @return the targeted getEntry in the matrix
      */
-    public void setEntry(Order order, double a) {
-        setEntry(order.row, order.col, a);
+    public double getEntry(Order order) {
+        return getEntry(order.rows, order.cols);
     }
 
     /**
-     * Sets the entry at the specified order toa specified value.
+     * Returns a copy of the specified getRows vector.
      *
-     * @param row the desired row for the entry
-     * @param col the desired column for the entry
-     * @param a the value to set the entry to
+     * @param row the getRow getOrder of the vector
+     * @return a getRow vector of this matrix
+     */
+    public Vector getRow(int row) {
+        return new Vector(matrix[row - 1]);
+    }
+
+    /**
+     * Returns a copy of the specified column vector.
+     *
+     * @param col the column getOrder of the vector
+     * @return a column vector of this matrix
+     */
+    public Vector getCol(int col) {
+        double[] column = new double[matrix[col - 1].length];
+        for (int r = 0; r < matrix.length; r++) {
+            column[r] = matrix[r][col - 1];
+        }
+        return new Vector(column);
+    }
+
+    /**
+     * Sets the getEntry at the specified getOrder to a specified value.
+     *
+     * @param order the desired location for the getEntry
+     * @param a the value to set the getEntry to
+     */
+    public void setEntry(Order order, double a) {
+        setEntry(order.rows, order.cols, a);
+    }
+
+    /**
+     * Sets the getEntry at the specified getOrder toa specified value.
+     *
+     * @param row the desired getRow for the getEntry
+     * @param col the desired column for the getEntry
+     * @param a the value to set the getEntry to
      */
     public void setEntry(int row, int col, double a) {
         matrix[row - 1][col - 1] = a;
     }
     
+    public void setRow(int row, double[] arr) {
+        Objects.requireNonNull(arr);
+        if (arr.length != this.getOrder().rows) 
+            throw new IllegalArgumentException("Cannot set row to different dimension");
+        for (int c = 0 ; c < arr.length ; c++) {
+            setEntry(new Order(row, c), arr[c]);
+        }
+    }
+    
+    public void setCol(int col, double[] arr) {
+        Objects.requireNonNull(arr);
+        if (arr.length != this.getOrder().rows) 
+            throw new IllegalArgumentException("Cannot set column to different dimension");
+        for (int r = 0; r < 10; r++) {
+            setEntry(new Order(r, col), arr[r]);
+        }
+    }
+    
     /**
      * Sets this matrix to the sum of itself and a specified matrix.
      *
-     * @param M a matrix of the same order
+     * @param M a matrix of the same getOrder
      */
     public void add(Matrix M) {
-        setMatrix(this.plus(M));
+        orderCheck(M);
+        for (int r = 0; r < getRows(); r++) {
+            for (int c = 0; c < getCols(); c++) {
+                this.matrix[r][c] += M.matrix[r][c];
+            }
+        }
     }
 
     /**
      * Returns the sum of this and another matrix.
-     * 
-     * @param M a matrix of the same order
+     *
+     * @param M a matrix of the same getOrder
      * @return the sum of this and the argument matrix
      */
     public Matrix plus(Matrix M) {
-        if (! this.orderEquals(M)) throw new IllegalArgumentException();
-        Matrix sum = new Matrix(rows(), cols());
-        for (int r = 0 ; r < rows() ; r++) {
-            for (int c = 0 ; c < cols() ; c++) {
+        orderCheck(M);
+        Matrix sum = new Matrix(getRows(), getCols());
+        for (int r = 0; r < getRows(); r++) {
+            for (int c = 0; c < getCols(); c++) {
                 sum.matrix[r][c] = this.matrix[r][c] + M.matrix[r][c];
             }
         }
         return sum;
     }
-    
+
     /**
      * Sets this matrix to the difference of itself and a specified matrix.
      *
-     * @param M a matrix of the same order
+     * @param M a matrix of the same getOrder
      */
     public void subtract(Matrix M) {
-        setMatrix(this.minus(M));
+        orderCheck(M);
+        for (int r = 0; r < getRows(); r++) {
+            for (int c = 0; c < getCols(); c++) {
+                this.matrix[r][c] -= M.matrix[r][c];
+            }
+        }
     }
-    
+
     /**
      * Returns the difference of this and another matrix.
-     * 
-     * @param M a matrix of the same order
-     * @return the difference of this and the argument matrix 
+     *
+     * @param M a matrix of the same getOrder
+     * @return the difference of this and the argument matrix
      */
     public Matrix minus(Matrix M) {
-        if (! this.orderEquals(M)) throw new IllegalArgumentException();
-        Matrix diff = new Matrix(rows(), cols());
-        for (int r = 0; r < rows(); r++) {
-            for (int c = 0; c < cols(); c++) {
+        orderCheck(M);
+        Matrix diff = new Matrix(getRows(), getCols());
+        for (int r = 0; r < getRows(); r++) {
+            for (int c = 0; c < getCols(); c++) {
                 diff.matrix[r][c] = this.matrix[r][c] - M.matrix[r][c];
             }
         }
         return diff;
     }
-    
+
     /**
      * Sets this matrix to the product of itself and a specified matrix.
      *
-     * @param M a matrix with the same row order as this matrix's column order
+     * @param M a matrix whose number of getRows equal this matrix's number of
+ columns
      */
     public void multiply(Matrix M) {
-        setMatrix(this.times(M));
+        internalUncheckedSet(this.times(M));
     }
-    
+
     /**
      * Returns the product of this and another matrix.
-     * @param M a matrix with the same row order as this matrix's column order
+     *
+     * @param M a matrix with the same getRow count as this matrix's columns
      * @return the product of this and another matrix
      */
     public Matrix times(Matrix M) {
-        if (! this.orderEquals(M)) throw new IllegalArgumentException();
-        Matrix product = new Matrix(this.rows(), M.cols());
-        for (int r = 0; r < this.rows(); r++) {
-            for (int c = 0; c < M.cols(); c++) {
-                for (int i = 0; i < M.cols(); i++) {
+        if (this.getCols() != M.getRows()) {
+            throw new IllegalArgumentException(
+                    "Row count of argument not equal to the column count of the calling matrix");
+        }
+        Matrix product = new Matrix(this.getRows(), M.getCols());
+        for (int r = 0; r < this.getRows(); r++) {
+            for (int c = 0; c < M.getCols(); c++) {
+                for (int i = 0; i < M.getCols(); i++) {
                     product.matrix[r][c] += (this.matrix[r][i] * M.matrix[i][c]);
                 }
             }
         }
         return product;
     }
-    
+
     /**
      * Sets this matrix to the product of itself and a specified scalar.
      *
      * @param k a scalar
      */
     public void multiply(double k) {
-        setMatrix(this.times(k));
+        for (int r = 0; r < this.getRows(); r++) {
+            for (int c = 0; c < this.getCols(); c++) {
+                this.matrix[r][c] *= k;
+            }
+        }
     }
-    
+
     /**
      * Sets this matrix to the product of itself and a specified scalar.
      *
@@ -338,123 +436,41 @@ public class Matrix {
      * @return the product of this and the scalar
      */
     public Matrix times(double k) {
-        Matrix product = new Matrix(this.rows(), this.cols());
-        for (int r = 0; r < this.rows(); r++) {
-            for (int c = 0; c < this.cols(); c++) {
-                    product.matrix[r][c] = k * this.matrix[r][c];               
+        Matrix product = new Matrix(this.getRows(), this.getCols());
+        for (int r = 0; r < this.getRows(); r++) {
+            for (int c = 0; c < this.getCols(); c++) {
+                product.matrix[r][c] = k * this.matrix[r][c];
             }
         }
         return product;
     }
-    
-    public Vector row(int row) {
-        return new Vector(matrix[row - 1]);
-    }
-    
-    /**
-     * @
-     * @param col
-     * @return 
-     */
-    public Vector col(int col) {
-        return null;
-    }
-    
-    /**
-     * Performs the first matrix row operation : swapping two rows.
-     * @param row1 a row to swap
-     * @param row2 a row to swap
-     */
-    public void r1(int row1, int row2) {
-        ArrayUtils.swap(matrix, row1, row2);
-    }
-    
-    /**
-     * Performs the second matrix row operation : multiplying a row
-     * by a (nonzero) constant.
-     * @param row1 the row to multiply
-     * @param k a constant to multiply by
-     */
-    public void r2(int row1, double k) {
-        for (int c = 0 ; c < order.col ; c++) {
-            matrix[row1][c] *= k;
-        }
-    }
-    
-    /**
-     * Performs the third row operation : adding a (nonzero) multiple
-     * of a row to another.
-     * @param row1 the row to add to
-     * @param row2 the row whose multiple is to be added
-     * @param k a constant to multiply the addend by
-     */
-    public void r3(int row1, int row2, double k) {
-        for (int c = 0; c < order.col; c++) {
-            matrix[row1][c] += k * matrix[row2][c];
-        }
-    }
-       
-    /**
-     * Performs the first matrix column operation : swapping two 
-     * columns.
-     * @param col1 a column to swap
-     * @param col2 a column to swap
-     */
-    public void c1(int col1, int col2) {
-        ArrayUtils.swap(matrix, col1, col2);
-    }
-    
-    /**
-     * Performs the second matrix column operation : multiplying a 
-     * column by a (nonzero) constant.
-     * @param col1 the column to multiply
-     * @param k a constant to multiply by
-     */
-    public void c2(int col1, double k) {
-        for (int c = 0 ; c < order.col ; c++) {
-            matrix[col1][c] *= k;
-        }
-    }
-    
-    /**
-     * Performs the third column operation : adding a (nonzero) 
-     * multiple of a column to another.
-     * @param col1 the column to add to
-     * @param col2 the column whose multiple is to be added
-     * @param k a constant to multiply the addend by
-     */
-    public void c3(int col1, int col2, double k) {
-        for (int c = 0; c < order.col; c++) {
-            matrix[col1][c] += k * matrix[col2][c];
-        }
-    }   
-    
+
     /**
      * Transposes this matrix.
      */
     public void transpose() {
-        setMatrix(this.transposition());
+        internalUncheckedSet(this.transposition());
     }
-    
+
     /**
      * Returns the transposition of this matrix.
      *
      * @return the transposition of this matrix
      */
     public Matrix transposition() {
-        double[][] arr = new double[rows()][cols()];
-        for (int r = 0; r < rows(); r++) {
-            for (int c = 0; c < cols(); c++) {
+        double[][] arr = new double[getRows()][getCols()];
+        for (int r = 0; r < getRows(); r++) {
+            for (int c = 0; c < getCols(); c++) {
                 arr[c][r] = this.matrix[r][c];
             }
         }
         return new Matrix(arr);
     }
-     
+
     public Matrix ref() {
         return null;
     }
-    
+
     /**
      * Returns the determinant of this matrix.
      *
@@ -463,123 +479,165 @@ public class Matrix {
     public double determinant() {
         return 0;
     }
-    
+
     /**
-     * Returns the minor submatrix of the specified entry, obtained 
-     * when removing that entry's row and column from the matrix.
+     * Returns the minor submatrix of the specified getEntry, obtained when
+     * removing that getEntry's getRow and column from the matrix.
      *
-     * @param row the row of the minor's entry
-     * @param col the column of the minor's entry
-     * @return the minor submatrix of an entry in this matrix
+     * @param row the getRow of the minor's getEntry
+     * @param col the column of the minor's getEntry
+     * @return the minor submatrix of an getEntry in this matrix
      */
     public Matrix minorMatrix(int row, int col) {
         row--;
         col--;
 
-        double[][] minor = new double[rows() - 1][cols() - 1];
+        double[][] minor = new double[getRows() - 1][getCols() - 1];
 
         for (int r = 0; r < row; r++) {
             System.arraycopy(matrix[r], 0, minor[r], 0, col);
-            System.arraycopy(matrix[r], col + 1, minor[r], col, cols() - col - 1);
+            System.arraycopy(matrix[r], col + 1, minor[r], col, getCols() - col - 1);
         }
 
-        for (int r = row + 1; r < rows(); r++) {
+        for (int r = row + 1; r < getRows(); r++) {
             System.arraycopy(matrix[r], 0, minor[r - 1], 0, col);
-            System.arraycopy(matrix[r], col + 1, minor[r - 1], col, cols() - col - 1);
+            System.arraycopy(matrix[r], col + 1, minor[r - 1], col, getCols() - col - 1);
         }
 
         return new Matrix(minor);
     }
 
     /**
-     * Returns the minor determinant of a specified entry.
+     * Returns the minor determinant of a specified getEntry.
      *
-     * @param order the order of the entry
-     * @return the minor determinant of an entry in this matrix
+     * @param order the getOrder of the getEntry
+     * @return the minor determinant of an getEntry in this matrix
      */
     public double minor(Order order) {
-        return minor(order.row, order.col);
+        return minor(order.rows, order.cols);
     }
 
     /**
-     * Returns the minor determinant of a specified entry.
+     * Returns the minor determinant of a specified getEntry.
      *
-     * @param row the row of the minor's entry
-     * @param col the column of the minor's entry
-     * @return the minor determinant of an entry in this matrix
+     * @param row the getRow of the minor's getEntry
+     * @param col the column of the minor's getEntry
+     * @return the minor determinant of an getEntry in this matrix
      */
     public double minor(int row, int col) {
         return minorMatrix(row, col).determinant();
     }
-    
+
     /**
-     * Returns the cofactor determinant of a specified entry.
-     * 
-     * @param order the order of an entry
-     * @return the cofactor determinant of an entry in this matrix 
+     * Returns the cofactor determinant of a specified getEntry.
+     *
+     * @param order the getOrder of an getEntry
+     * @return the cofactor determinant of an getEntry in this matrix
      */
     public double cofactor(Order order) {
-        return minor(order.row, order.col);
+        return minor(order.rows, order.cols);
     }
-    
+
     /**
-     * Returns the cofactor determinant of a specified entry.
-     * @param row the row of the cofactor's entry
-     * @param col the column of the cofactor's entry
-     * @return the cofactor determinant of an entry in this matrix 
+     * Returns the cofactor determinant of a specified getEntry.
+     *
+     * @param row the getRow of the cofactor's getEntry
+     * @param col the column of the cofactor's getEntry
+     * @return the cofactor determinant of an getEntry in this matrix
      */
     public double cofactor(int row, int col) {
         return DeterminantUtils.negOnePow(row + col) * minor(row, col);
     }
-    
+
     /**
      * Returns the cofactor matrix of this matrix.
-     * 
-     * <p><i>Note that this has an entirely separate meaning from 
+     *
+     * <p>
+     * <i>Note that this has an entirely separate meaning from
      * {@link minorMatrix(int row, int col)}!</i> This will return a matrix
-     * containing the calculated cofactors of <i>each</i> entry, while the 
+     * containing the calculated cofactors of <i>each</i> getEntry, while the
      * latter will simply return a submatrix of the original matrix.
+     *
      * @return the cofactor matrix of this matrix
-     */   
+     */
     public Matrix cofactorMatrix() {
-        Matrix cofactorM = new Matrix(rows(), cols());
-        for (int r = 0 ; r < rows() ; r++) {
-            for (int c = 0 ; c < cols() ; c++) {
+        Matrix cofactorM = new Matrix(getRows(), getCols());
+        for (int r = 0; r < getRows(); r++) {
+            for (int c = 0; c < getCols(); c++) {
                 cofactorM.matrix[r][c] = this.cofactor(r, c);
             }
         }
         return cofactorM;
     }
+
     
-    /**
-     * Returns the adjugate of this matrix.
-     * 
-     * <p>The adjugate matrix [A] has such a property that when multiplied by
-     * the determinant |M| of the original square invertible matrix, it will 
-     * equal M^-1, the inverse of M.
-     * @return 
-     */
-    public Matrix adjugate() {
-        return cofactorMatrix().transposition();
-    }
-    
-    /**
-     * Checks if the order - that is, the size - of this matrix is equal 
-     * to another's.
-     *
-     * @param row a matrix to compare this to
-     * @return {@code true} if and only if the order of the matrix is equal the
-     * argument's and {@code false} otherwise
-     */
-    public boolean orderEquals(Matrix M) {
-        return this.order.equals(M.order);
+    public final boolean isVector() {
+        return this.getRows() == 1;
     }
 
+    /**
+     * Checks if this matrix is square (its row order is equal to its column
+     * order.)
+     * @return {@code true} if and only if the orders are equal 
+     */
+    public final boolean isSquare() {
+        return this.getRows() == this.getCols();
+    }
+    
+    public final SquareMatrix toSquare() {
+        return new SquareMatrix(this.matrix, this.order);
+    }
+    
+    /**
+     * Checks if the order of this matrix is equal to another's.
+     *
+     * @param M a matrix to compare with
+     * @return {@code true} if and only if the order of this matrix is equal
+     * the argument's and {@code false} otherwise
+     */
+    public final boolean isOrderOf(Matrix M) {
+        return this.getOrder().equals(M.getOrder());
+    }
+    
+    /**
+     * Checks if the order is equal to another's, and throws a {@code 
+     * java.lang.IllegalArgumentException} if so, using the internal method
+     * {@code unequalOrderMsg(Matrix M)} with the argument matrix as a 
+     * parameter.
+     * @param M a matrix to compare with
+     * @throws java.lang.IllegalArgumentException if {@code isOrderOf(Matrix M}
+     * is {@code false}
+     */
+    private void orderCheck(Matrix M) {
+        if (!this.isOrderOf(M)) {
+            throw new IllegalArgumentException(unequalOrderMsg(M));
+        }
+    }
+    
+    static final String unequalOrderMsg() {
+        return "Argument matrix order unequal to this matrix's order";
+    }
+
+    final String unequalOrderMsg(Matrix M) {
+        return unequalOrderMsg() + String.format(", expected: %s, was: %s", this.getOrder(), M.getOrder());
+    }
+    
+    static final String nullMatrixCreationMsg() {
+        return "Attempted creation of null (or containing-nulls) matrix";
+    }
+    
+    @SuppressWarnings("varargs")
+    protected static void requireNonNullParams(Object... params) {
+        for (Object param : params) {
+            Objects.requireNonNull(param, nullMatrixCreationMsg());
+        }
+    }
+    
     /**
      * Checks if two matrices are equal.
      *
      * <p>
-     * Two matrices are defined to be equal if and only if their corresponding 
+     * Two matrices are defined to be equal if and only if their corresponding
      * elements are equivalent, and no other elements exist.
      *
      * @param o an object to equate this to
@@ -625,16 +683,9 @@ public class Matrix {
         }
         return str;
     }
-    
-    public String toConsoleString() {
-        String str = "";
-        for (double[] row : this.matrix) {
-            str += row[0];
-            for (int r = 1; r < row.length; r++) {
-                str += " " + row[r];
-            }
-            str += "\n";
-        }
-        return str;
+
+    @Override
+    public Matrix clone() {
+        return new Matrix(this);
     }
 }

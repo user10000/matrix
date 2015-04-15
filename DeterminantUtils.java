@@ -16,20 +16,20 @@ class DeterminantUtils {
     
     
     public static double determinantRecursive(Matrix m) {
-        return determinantRecursive(m, m.rows());
+        return determinantRecursive(m, m.getRows());
     }
     
     public static double determinantRecursive(Matrix m, int N) {
         if (N == 1) {
-            return m.entry(1, 1);
+            return m.getEntry(1, 1);
         }
         
         else {
             Matrix minor;
             double det = 0;
-            for (int i = 1 ; i <= m.rows() ; i++) {
+            for (int i = 1 ; i <= m.getRows() ; i++) {
                 minor = m.minorMatrix(1, i);
-                det += m.entry(1, i) * negOnePow(1 + i) * determinantRecursive(minor, minor.rows());
+                det += m.getEntry(1, i) * negOnePow(1 + i) * determinantRecursive(minor, minor.getRows());
             }
             return det;
         }
